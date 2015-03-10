@@ -25,6 +25,7 @@ int cmd_io_print_char()
     }
     
     fprintf(stdout, "%c", (char) stack[sp-1]);
+    cmd_stack_pop();
     return 0;
 }
 
@@ -38,6 +39,7 @@ int cmd_io_print_num()
     }
     
     fprintf(stdout, "%d", (int) stack[sp-1]);
+    cmd_stack_pop();
     return 0;
 }
 
