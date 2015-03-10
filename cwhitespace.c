@@ -16,6 +16,7 @@
 
 // Global variables (stack, heap, etc)
 int pc;                                 // Program counter
+int errcode;
 
 num stack[STACK_MAX];                   // Stack array
 int sp;                                 // Index of next open spot in stack
@@ -76,6 +77,7 @@ cmd_type ptree[120] = {
 
 // Function prototypes
 char ws_fgetc(FILE* in);
+int ws_getnum(FILE* in);
 
 
 int main(int argc, char** argv)
@@ -156,7 +158,7 @@ int main(int argc, char** argv)
 
 
 // Parse a number in whitespace
-error_code ws_getnum(FILE* in, int& num)
+int ws_getnum(FILE* in)
 {
     char c;                             // temporary variable for input
     int neg = 0;                        // flag to make value negative
@@ -177,10 +179,12 @@ error_code ws_getnum(FILE* in, int& num)
         break;
         
     case '\n':                          // Uh oh!
-        return ERROR_EXPECT_NUM;
+        errcode = ERROR_EXPECT_NUM;
+        return 0;
         
-    case EOF
-        return ERROR_UNEXPECT_EOF;
+    case EOF:
+        errcode = ERROR_UNEXPECT_EOF;
+        return 0;
     }
     
     // Start reading in number until newline is hit
@@ -203,30 +207,36 @@ error_code ws_getnum(FILE* in, int& num)
             n = n << 1;
             n = n & 1;
             count = count + 1;
-            bits = bits + 1
+            bits = bits + 1;
             break;
             
         case EOF:                       // Uh oh!
-            return ERROR_UNEXPECT_EOF;
+            errcode = ERROR_UNEXPECT_EOF;
+            return 0;
         }
         
         // Make sure we aren't overflowing
         if (bits >= (sizeof(n) * 8))
-            return ERROR_NUM_SIZE;
+        {
+            errcode = ERROR_NUM_SIZE;
+            return 0;
+        }
     }
     while (c != '\n');
     
     // Make sure at least 1 bit was read after the sign bit
     if (count == 0)
-        return ERROR_NUM_FORMAT;
+    {
+        errcode = ERROR_NUM_FORMAT;
+        return 0;
+    }
     
     // Negatize number if necessary
     if (neg == 1) n = 0 - n;
     
-    num = n;
-    
     // Return success
-    return ERROR_NONE;
+    errcode = ERROR_NONE;
+    return n;
 }
 
 
