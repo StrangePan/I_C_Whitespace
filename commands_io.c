@@ -20,7 +20,7 @@ int cmd_io_print_char()
     // Make sure we even have something in the stack
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -34,7 +34,7 @@ int cmd_io_print_num()
     // Make sure we even have something in the stack
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -50,7 +50,7 @@ int cmd_io_get_char()
     // Make sure we even have something in the stack
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -71,7 +71,7 @@ int cmd_io_get_num()
     // Make sure we even have something in the stack
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     

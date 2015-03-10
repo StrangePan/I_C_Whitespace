@@ -20,7 +20,7 @@ int cmd_math_add()
     // Make sure we have something to work with
     if (sp < 2)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -35,7 +35,7 @@ int cmd_math_subtract()
     // Make sure we have something to work with
     if (sp < 2)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -50,7 +50,7 @@ int cmd_math_multiply()
     // Make sure we have something to work with
     if (sp < 2)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -65,7 +65,7 @@ int cmd_math_divide()
     // Make sure we have something to work with
     if (sp < 2)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -80,7 +80,7 @@ int cmd_math_modulo()
     // Make sure we have something to work with
     if (sp < 2)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     

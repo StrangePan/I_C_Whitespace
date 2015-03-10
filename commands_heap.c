@@ -22,7 +22,7 @@ int cmd_heap_store()
     // Make sure we have stuff to work with
     if (sp < 2)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -32,7 +32,7 @@ int cmd_heap_store()
     // Verify address is valid
     if (addr < 0)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_OUT_OF_BOUNDS;  // ILLEGAL ACCESS
         return -1;
     }
     
@@ -48,7 +48,7 @@ int cmd_heap_store()
         // If we made full loop, no open spots
         if (i == HEAP_MAX)
         {
-            // TODO HEAP FULL
+            errcode = ERROR_HEAP_FULL;  // HEAP FULL
             return -1;
         }
         
@@ -72,7 +72,7 @@ int cmd_heap_retrieve()
     // Make sure we have stuff to work with
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -82,7 +82,7 @@ int cmd_heap_retrieve()
     // Verify address is valid
     if (addr < 0)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_OUT_OF_BOUNDS;  // ILLEGAL ACCESS
         return -1;
     }
     
@@ -98,7 +98,7 @@ int cmd_heap_retrieve()
         // If we made full loop, address not allocated
         if (i == HEAP_MAX)
         {
-            // TODO ADDRESS NOT ALLOCATED
+            errcode = ERROR_HEAP_NOT_ALLOC; // ADDRESS NOT ALLOCATED
             return -1;
         }
         

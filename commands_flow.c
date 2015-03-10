@@ -31,14 +31,14 @@ int cmd_flow_mark(num arg)
         // If we made full loop, no open spots
         if (i == LABEL_MAX)
         {
-            // TODO TOO MANY LABELS DECLARED
+            errcode = ERROR_LABEL_FULL;       // TOO MANY LABELS DECLARED
             return -1;
         }
 
         // If we find duplicate, throw error
         if (labels[j] == arg && labelvals[j] != -1)
         {
-            // TODO LABEL ALREADY DECLARED
+            errcode = ERROR_LABEL_DUP;  // LABEL ALREADY DECLARED
             return -1;
         }
 
@@ -60,7 +60,7 @@ int cmd_flow_subroutine(num arg)
     // Make sure we don't overflow our PC stack
     if (pcsp >= PCSTACK_MAX)
     {
-        // TODO STACK OVERFLOW!
+        errcode = ERROR_STACK_FULL;     // STACK OVERFLOW!
         return -1;
     }
     
@@ -84,7 +84,7 @@ int cmd_flow_goto(num arg)
         // If we made a full loop, label not found
         if (i == LABEL_MAX)
         {
-            // TODO NO SUCH LABEL
+            errcode = ERROR_LABEL_NOT_DEC;// NO SUCH LABEL
             return -1;
         }
         
@@ -104,7 +104,7 @@ int cmd_flow_goto_zero(num arg)
     // Make sure we even have something on the stack
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS EXCEPTION
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -119,7 +119,7 @@ int cmd_flow_goto_negative(num arg)
     // Make sure we even have something on the stack
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS EXCEPTION
+        errcode = ERROR_OUT_OF_BOUNDS;  // ILLEGAL ACCESS EXCEPTION
         return -1;
     }
     
@@ -134,7 +134,7 @@ int cmd_flow_return()
     // Make sure we have something to pop from
     if (pcsp < 1)
     {
-        // TODO RETURNING FROM NOWHERE!
+        errcode = ERROR_RETURN_NOWHERE; // RETURNING FROM NOWHERE!
         return -1;
     }
     

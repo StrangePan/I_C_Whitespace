@@ -36,7 +36,7 @@ num heap[HEAP_MAX];                     // Map for heap addresses
 num heapvals[HEAP_MAX];                  // Values in heap
 
 struct stmt* cache;                     // Dynamic array for cached values
-int cp;                                 // Pointer into next open spot in cache
+int cp = -1;                                 // Pointer into next open spot in cache
 int cache_size;
 
 // Fancy parse lookup tree for fast parsing
@@ -87,6 +87,7 @@ cmd_type ptree[120] = {
 // Function prototypes
 char ws_fgetc(FILE* in);
 num ws_getnum(FILE* in);
+void printError();
 
 
 int main(int argc, char** argv)
@@ -171,19 +172,19 @@ int main(int argc, char** argv)
             
             if (errcode != ERROR_NONE)
             {
-                // TODO Display error
+                printError();
                 exit(1);
                 break;
             }
             
             cmd_flow_mark(n);
-	    
+        
 #ifdef VERBOSE
-	    printf("created label %d\n", n);
+        printf("created label %d\n", n);
 #endif
-	    
-	    // Reset ptree pointer if needed
-	    ptreeptr = 0;
+        
+        // Reset ptree pointer if needed
+        ptreeptr = 0;
             break;
             
             
@@ -197,9 +198,9 @@ int main(int argc, char** argv)
             n = ws_getnum(in);
             
 #ifdef VERBOSE
-	    printf("parsed number %d  ", n);
+        printf("parsed number %d  ", n);
 #endif
-	    
+        
             // Make sure no errors occured during parsing
             if (errcode != ERROR_NONE)
             {
@@ -245,26 +246,26 @@ int main(int argc, char** argv)
             cache[cp].cmd = ptree[ptreeptr];
             cache[cp].arg = n;
             cp = cp + 1;
-	    
+        
 #ifdef VERBOSE
-	    printf("compiled command: %d\n", ptree[ptreeptr]);
+        printf("compiled command: %d\n", ptree[ptreeptr]);
 #endif
-	    
-	    // Reset ptree pointer if needed
-	    ptreeptr = 0;
+        
+        // Reset ptree pointer if needed
+        ptreeptr = 0;
             break;
             
         case INVALID:
         default:
             // TODO Display error
             exit(1);
-	    
-	    // Reset ptree pointer if needed
-	    ptreeptr = 0;
+        
+        // Reset ptree pointer if needed
+        ptreeptr = 0;
             break;
         }
         
-	
+    
     }
     
 #ifdef VERBOSE
@@ -377,19 +378,38 @@ int main(int argc, char** argv)
             break;
         }
         
-        // TODO Display errors
+        // Break out if any error is encountered
+    if (errcode != ERROR_NONE)
+        break;
     }
     
     
-    // Check if we broke because of an error
+    // Check if we broke because of an IO error
     if (ferror(in))
     {
         fprintf(stderr, "Error occured while reading from file\n");
         exit(1);
     }
-
-    fclose(in);
     
+    // Determine whether the program cleaned up after itself or if it was terminated properly
+    if (errcode == ERROR_NONE && (pc >= cp || cache[pc].cmd != FLOW_EXIT))
+        errcode = ERROR_UNEXPECT_EXIT;
+    
+    // Print required error message
+    if (errcode != ERROR_NONE)
+        printError();
+    
+    // Program unexpectedly terminated, print reason
+    if (errcode == ERROR_UNEXPECT_EXIT)
+        fprintf(stderr, "Program reached end of code without encountering end-of-program character sequence.\n");
+    
+    // Print out items remaining on stack at time of termination
+    if (sp > 0)
+        fprintf(stderr, "Items remaining on stack at exit: %d\n", sp);
+    
+    
+    // Clean up and go home!
+    fclose(in);
     return 0;
 }
 
@@ -503,4 +523,101 @@ char ws_fgetc(FILE* in)
     while (1);
     
     return c;
+}
+
+void printError()
+{
+    if (errcode == ERROR_NONE) return;
+    
+    // Output line number
+    if (pc == -1)
+        fprintf(stderr, "Compile error, command %d: ", cp);
+    else
+        fprintf(stderr, "Runtime error, command %d: ", pc);
+    
+    switch(errcode)
+    {
+    case ERROR_NONE:
+        // :)
+        break;
+    
+    case ERROR_NUM_FORMAT:
+        fprintf(stderr, "Unable to parse numerical constant");
+        break;
+    
+    case ERROR_NUM_SIZE:
+        fprintf(stderr, "Number too large (greater than %d bits)", (sizeof(num) * 8) - 1);
+        break;
+    
+    case ERROR_EXPECT_NUM:
+        fprintf(stderr, "Number expected but not received");
+        break;
+    
+    case ERROR_UNEXPECT_SPACE:
+        fprintf(stderr, "Unexpected space character");
+        break;
+    
+    case ERROR_UNEXPECT_TAB:
+        fprintf(stderr, "Unexpected tab character");
+        break;
+    
+    case ERROR_UNEXPECT_LINEFEED:
+        fprintf(stderr, "Unexpected linefeed character");
+        break;
+    
+    case ERROR_UNEXPECT_EOF:
+        fprintf(stderr, "Unexpected end of file");
+        break;
+    
+    case ERROR_COMMAND_INVALID:
+        fprintf(stderr, "Unrecognize/invalid command");
+        break;
+
+    case ERROR_UNEXPECT_EXIT:
+        fprintf(stderr, "Unexpected end of program");
+        break;
+    
+    case ERROR_STACK_EMPTY:
+        fprintf(stderr, "Attempt to pop from an empty stack");
+        break;
+    
+    case ERROR_STACK_FULL:
+        fprintf(stderr, "Attempt to push onto an already full stack");
+        break;
+    
+    case ERROR_HEAP_NOT_ALLOC:
+        fprintf(stderr, "Attempt to access uninitialized heap address");
+        break;
+    
+    case ERROR_HEAP_FULL:
+        fprintf(stderr, "Attempt to write to an already full heap");
+        break;
+    
+    case ERROR_LABEL_NOT_DEC:
+        fprintf(stderr, "Label not found");
+        break;
+    
+    case ERROR_LABEL_DUP:
+        fprintf(stderr, "Label already declared in file");
+        break;
+    
+    case ERROR_LABEL_FULL:
+        fprintf(stderr, "Maximum limit of unique labels reached");
+        break;
+    
+    case ERROR_SUBROUTINE_DEPTH:
+        fprintf(stderr, "Maximum subroutine depth reached");
+        break;
+    
+    case ERROR_RETURN_NOWHERE:
+        fprintf(stderr, "Attempt to return from a non-subroutine");
+        break;
+        
+    case ERROR_OUT_OF_BOUNDS:
+        fprintf(stderr, "Attempt to access location out of bounds");
+        break;
+    
+    }
+    
+    fprintf(stderr, "\n");
 }

@@ -20,7 +20,7 @@ int cmd_stack_push(num arg)
     // Make sure we have room
     if (sp >= STACK_MAX)
     {
-        // TODO STACK OVERFLOW!
+        errcode = ERROR_STACK_FULL;     // STACK OVERFLOW!
         return -1;
     }
     
@@ -35,7 +35,7 @@ int cmd_stack_duplicate()
     // Make sure we even have something to duplicate
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -47,7 +47,7 @@ int cmd_stack_copy(num arg)
     // Make sure we are operating within valid range
     if (arg < 0 || arg >= sp)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_OUT_OF_BOUNDS;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -61,7 +61,7 @@ int cmd_stack_swap()
     // Make sure we even have something to swap
     if (sp < 2)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -77,7 +77,7 @@ int cmd_stack_pop()
     // Make sure we event have something to pop
     if (sp < 1)
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_STACK_EMPTY;    // ILLEGAL ACCESS
         return -1;
     }
     
@@ -90,7 +90,7 @@ int cmd_stack_slide(num arg)
     // Make sure we are operating within valid range
     if (arg < 0 || arg >= (sp - 1))
     {
-        // TODO ILLEGAL ACCESS
+        errcode = ERROR_OUT_OF_BOUNDS;  // ILLEGAL ACCESS
         return -1;
     }
     
