@@ -10,6 +10,7 @@
 // Includes
 #include <stdlib.h>
 #include <stdio.h>
+#include "cmd_type.h"
 
 // Global constants
 #define STACK_MAX    512
@@ -21,10 +22,10 @@
 
 // Global typedefs and structs
 typedef int num;				// Datatype for numbers and labels alike
-struct cmd {
-	int func;
+typedef struct stmt {
+	cmd_type cmd;
 	num arg;
-};
+} stmt;
 
 
 // Global variables (stack, heap, etc)
@@ -39,7 +40,7 @@ int labelbals[LABEL_MAX];		// Map of program counter points
 num heap[HEAP_MAX];				// Map for heap addresses
 num heapval[HEAP_MAX];			// Values in heap
 
-struct cmd* cache;				// Dynamic array for cached values
+struct stmt* cache;				// Dynamic array for cached values
 int cp;							// Pointer into next open spot in cache
 
 
