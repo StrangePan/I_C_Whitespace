@@ -1,10 +1,32 @@
 /**
+ * I C Whitespace
+ * Written by Daniel "Deaboy" Andrus
+ * 
+ * 
  * So you want to code in Whitespace, eh?
  * May God have mercy on your soul.
  *
  * Please note that everything's got hard limits.
  * Whitespace doesn't have limits on data size, so a virtual machine that
- * provides unlimited resources is unrealistic.
+ * provides unlimited resources is unrealistic. Sorry, but that's how it goes.
+ * You can modify the limits in defines.h to increase stack and heap sizes, but
+ * don't go overboard.
+ *
+ * 
+ * License:
+ *     This software is distributed under the GNU GENERAL PUBLIC LICENSE. View
+ *     LINCENSE file distributed with this source code or that is available on
+ *     the GitHub repo for more information.
+ * 
+ * References:
+ *    Project repo on GitHub: https://github.com/Deaboy/I_C_Whitespace
+ *    Information on Whitespace: http://compsoc.dur.ac.uk/whitespace/
+ * 
+ * Compilation:
+ *    make
+ *
+ * Usage:
+ *    whitespace <file>
  */
 
 // Includes
