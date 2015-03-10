@@ -29,6 +29,7 @@ num heapval[HEAP_MAX];                  // Values in heap
 
 struct stmt* cache;                     // Dynamic array for cached values
 int cp;                                 // Pointer into next open spot in cache
+int cache_size;
 
 // Fancy parse lookup tree for fast parsing
 cmd_type ptree[120] = {
@@ -77,14 +78,17 @@ cmd_type ptree[120] = {
 
 // Function prototypes
 char ws_fgetc(FILE* in);
-int ws_getnum(FILE* in);
+num ws_getnum(FILE* in);
 
 
 int main(int argc, char** argv)
 {
     FILE *in;                           // Pointer to input file
     char c;                             // Temporary variable for input
-    int ptreeptr = 0;                    // Current index into parse tree
+    num n;                              // Temporary variable for input
+    int ptreeptr = 0;                   // Current index into parse tree
+    struct stmt* cache_temp;            // Temp var for array doubling
+    int i;                              // For loopz
     
     // Print help if incorrect number of arguments were provided
     if (argc != 2)
@@ -103,7 +107,12 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    // Read until end of file or an error occures
+    // Allocate space for cache
+    cache_size = CACHE_MIN;
+    cache = malloc(sizeof(stmt) * cache_size);
+    cp = 0;
+    
+    // Read until end of file or an error occures, precompiling code
     while (1)
     {
         c = ws_fgetc(in);
@@ -134,15 +143,76 @@ int main(int argc, char** argv)
             ptreeptr = (ptreeptr + 1) * 3;      // DEEPER INTO THE TREE WE GO
             break;
             
+        case STACK_PUSH:
+        case STACK_COPY:
+        case STACK_SLIDE:
+        case FLOW_MARK:
+        case FLOW_SUBROUTINE:
+        case FLOW_GOTO:
+        case FLOW_GOTO_ZERO:
+        case FLOW_GOTO_NEGATIVE:        // These commands require number parameter
+            n = ws_getnum(in);
             
+            // Make sure no errors occured during parsing
+            if (errcode != ERROR_NONE)
+            {
+                // TODO Display error
+                exit(1);
+                break;
+            }
+            
+        case STACK_DUPLICATE:
+        case STACK_SWAP:
+        case STACK_POP:
+        case MATH_ADD:
+        case MATH_SUBTRACT:
+        case MATH_MULTIPLY:
+        case MATH_DIVIDE:
+        case MATH_MODULO:
+        case HEAP_STORE:
+        case HEAP_RETRIEVE:
+        case FLOW_RETURN:
+        case FLOW_EXIT:
+        case IO_PRINT_CHAR:
+        case IO_PRINT_NUM:
+        case IO_GET_CHAR:
+        case IO_GET_NUM:
+            
+            // If needed, double cache size
+            if (cp == cache_size)
+            {
+                cache_temp = malloc(sizeof(stmt) * (cache_size * 2));
+                
+                // copy everything over :(
+                for (i = 0; i < cache_size; i = i + 1)
+                {
+                    cache_temp[i] = cache[i];
+                }
+                
+                free(cache);
+                cache = cache_temp;
+                cache_size = cache_size * 2;
+            }
+            
+            // Store command and argument in cache for future execution
+            cache[cp].cmd = ptree[ptreeptr];
+            cache[cp].arg = n;
+            cp = cp + 1;
+            
+            break;
             
         case INVALID:
         default:
             // TODO Display error
+            exit(1);
             break;
         }
         
     }
+    
+    
+    // Now we actually execute the code
+    
     
     // Check if we broke because of an error
     if (ferror(in))
@@ -158,13 +228,13 @@ int main(int argc, char** argv)
 
 
 // Parse a number in whitespace
-int ws_getnum(FILE* in)
+num ws_getnum(FILE* in)
 {
     char c;                             // temporary variable for input
     int neg = 0;                        // flag to make value negative
     int bits = 0;                       // Count number of bits required to store number
     int count = 0;                      // Bits read from file (to enforce minimum of 1 bit)
-    int n = 0;                          // Reset given number
+    num n = 0;                          // Reset given number
     
     // Determine if number is positive/negative
     c = ws_fgetc(in);
