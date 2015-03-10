@@ -246,7 +246,6 @@ int main(int argc, char** argv)
             cache[cp].cmd = ptree[ptreeptr];
             cache[cp].arg = n;
             cp = cp + 1;
-            
             break;
             
         case INVALID:
