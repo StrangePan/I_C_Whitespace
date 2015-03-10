@@ -212,6 +212,112 @@ int main(int argc, char** argv)
     
     
     // Now we actually execute the code
+    for (pc = 0; pc <= cp && cache[pc].cmd != FLOW_EXIT; pc++)
+    {
+        switch (cache[pc].cmd)
+        {
+        case STACK_PUSH:
+            cmd_stack_push(cache[pc].arg);
+            break;
+            
+        case STACK_DUPLICATE:
+            cmd_stack_duplicate();
+            break;
+            
+        case STACK_COPY:
+            cmd_stack_copy(cache[pc].arg);
+            break;
+            
+        case STACK_SWAP:
+            cmd_stack_swap();
+            break;
+            
+        case STACK_POP:
+            cmd_stack_pop();
+            break;
+            
+        case STACK_SLIDE:
+            cmd_stack_slide(cache[pc].arg);
+            break;
+            
+        case MATH_ADD:
+            cmd_math_add();
+            break;
+            
+        case MATH_SUBTRACT:
+            cmd_math_subtract();
+            break;
+            
+        case MATH_MULTIPLY:
+            cmd_math_multiply();
+            break;
+            
+        case MATH_DIVIDE:
+            cmd_math_divide();
+            break;
+            
+        case MATH_MODULO:
+            cmd_math_modulo();
+            break;
+            
+        case HEAP_STORE:
+            cmd_heap_store();
+            break;
+            
+        case HEAP_RETRIEVE:
+            cmd_heap_retrieve();
+            break;
+
+        case FLOW_MARK:
+            cmd_flow_mark(cache[pc].arg);
+            break;
+            
+        case FLOW_SUBROUTINE:
+            cmd_flow_subroutine(cache[pc].arg);
+            break;
+            
+        case FLOW_GOTO:
+            cmd_flow_goto(cache[pc].arg);
+            break;
+            
+        case FLOW_GOTO_ZERO:
+            cmd_flow_goto_zero(cache[pc].arg);
+            break;
+            
+        case FLOW_GOTO_NEGATIVE:
+            cmd_flow_goto_negative(cache[pc].arg);
+            break;
+            
+        case FLOW_RETURN:
+            cmd_flow_return();
+            break;
+            
+        case FLOW_EXIT:
+            // Already handled in loop
+            break;
+            
+        case IO_PRINT_CHAR:
+            cmd_io_print_char();
+            break;
+            
+        case IO_PRINT_NUM:
+            cmd_io_print_num();
+            break;
+            
+        case IO_GET_CHAR:
+            cmd_io_get_char();
+            break;
+            
+        case IO_GET_NUM:
+            cmd_io_get_num();
+            break;
+            
+        default:                        // We shouldn't ever make it here
+            break;
+        }
+        
+        // TODO Display errors
+    }
     
     
     // Check if we broke because of an error

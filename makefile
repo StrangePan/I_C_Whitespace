@@ -4,7 +4,8 @@ EXECS = cwhitespace
 
 all: $(EXECS)
 
-cwhitespace: cwhitespace.c commands.c
+cwhitespace: cwhitespace.c commands_stack.c commands_math.c commands_flow.c \
+commands_heap.c commands_io.c
 	$(CC) $(FLAGS) -o $@ $? $(LIBS)
 
 clean:
