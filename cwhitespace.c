@@ -19,13 +19,13 @@ int pc;                                 // Program counter
 int errcode;
 
 num stack[STACK_MAX];                   // Stack array
-int sp;                                 // Index of next open spot in stack
+int sp = 0;                             // Index of next open spot in stack
 
 num labels[LABEL_MAX];                  // Map of labels (index corresponds to index in labelptrs
-int labelbals[LABEL_MAX];               // Map of program counter points
+int labelvals[LABEL_MAX];               // Map of program counter points
 
 num heap[HEAP_MAX];                     // Map for heap addresses
-num heapval[HEAP_MAX];                  // Values in heap
+num heapvals[HEAP_MAX];                  // Values in heap
 
 struct stmt* cache;                     // Dynamic array for cached values
 int cp;                                 // Pointer into next open spot in cache
@@ -112,6 +112,12 @@ int main(int argc, char** argv)
     cache = malloc(sizeof(stmt) * cache_size);
     cp = 0;
     
+    // Initialize heap and label maps
+    for (i = 0; i < LABEL_MAX; i++)
+        labels[i] = -1;
+    for (i = 0; i < HEAP_MAX; i++)
+        heap[i] = -1;
+    
     // Read until end of file or an error occures, precompiling code
     while (1)
     {
@@ -143,10 +149,52 @@ int main(int argc, char** argv)
             ptreeptr = (ptreeptr + 1) * 3;      // DEEPER INTO THE TREE WE GO
             break;
             
+        case FLOW_MARK:                 // Mark point in code
+            n = ws_getnum(in);
+            
+            if (errcode != ERROR_NONE)
+            {
+                // TODO Display error
+                exit(1);
+                break;
+            }
+            
+            // Attempt to create new label
+            // 1. Must be at least 1 open slot
+            // 2. Must not already exist
+            n = n % LABEL_MAX;
+            for (i = 0; i <= LABEL_MAX; i++)
+            {
+                // If we made full loop, no open spots
+                if (i == LABEL_MAX)
+                {
+                    // TODO throw error
+                    exit(1);
+                    break;
+                }
+                
+                // If we find duplicate, throw error
+                if (labels[(n + i) % LABEL_MAX] == n)
+                {
+                    // TODO throw error
+                    exit(1);
+                    break;
+                }
+                
+                // Check for clear spot. If found, take it!
+                if (labels[(n + i) % LABEL_MAX] == -1)
+                {
+                    labels[(n + i) % LABEL_MAX] = n;
+                    labelvals[(n + i) % LABEL_MAX] = cp;
+                    break;
+                }
+            }
+            break;
+            
+            
         case STACK_PUSH:
         case STACK_COPY:
         case STACK_SLIDE:
-        case FLOW_MARK:
         case FLOW_SUBROUTINE:
         case FLOW_GOTO:
         case FLOW_GOTO_ZERO:
