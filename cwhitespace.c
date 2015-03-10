@@ -14,6 +14,11 @@
 
 
 
+// Our friendly neighborhood debug flag
+//#define VERBOSE
+
+
+
 // Global variables (stack, heap, etc)
 int pc;                                 // Program counter
 int errcode;
@@ -110,6 +115,10 @@ int main(int argc, char** argv)
         exit(1);
     }
     
+#ifdef VERBOSE
+    printf("opened file, copmiling\n");
+#endif
+    
     // Allocate space for cache
     cache_size = CACHE_MIN;
     cache = malloc(sizeof(stmt) * cache_size);
@@ -168,6 +177,13 @@ int main(int argc, char** argv)
             }
             
             cmd_flow_mark(n);
+	    
+#ifdef VERBOSE
+	    printf("created label %d\n", n);
+#endif
+	    
+	    // Reset ptree pointer if needed
+	    ptreeptr = 0;
             break;
             
             
@@ -180,6 +196,10 @@ int main(int argc, char** argv)
         case FLOW_GOTO_NEGATIVE:        // These commands require number parameter
             n = ws_getnum(in);
             
+#ifdef VERBOSE
+	    printf("parsed number %d  ", n);
+#endif
+	    
             // Make sure no errors occured during parsing
             if (errcode != ERROR_NONE)
             {
@@ -225,16 +245,31 @@ int main(int argc, char** argv)
             cache[cp].cmd = ptree[ptreeptr];
             cache[cp].arg = n;
             cp = cp + 1;
+	    
+#ifdef VERBOSE
+	    printf("compiled command: %d\n", ptree[ptreeptr]);
+#endif
+	    
+	    // Reset ptree pointer if needed
+	    ptreeptr = 0;
             break;
             
         case INVALID:
         default:
             // TODO Display error
             exit(1);
+	    
+	    // Reset ptree pointer if needed
+	    ptreeptr = 0;
             break;
         }
         
+	
     }
+    
+#ifdef VERBOSE
+    printf ("compiled, running\n");
+#endif
     
     
     // Now we actually execute the code
@@ -407,7 +442,7 @@ num ws_getnum(FILE* in)
             
         case '\t':                      // Tab means 1 bit
             n = n << 1;
-            n = n & 1;
+            n = n | 1;
             count = count + 1;
             bits = bits + 1;
             break;
