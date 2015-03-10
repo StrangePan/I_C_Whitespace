@@ -114,9 +114,14 @@ int main(int argc, char** argv)
     
     // Initialize heap and label maps
     for (i = 0; i < LABEL_MAX; i++)
+    {
         labels[i] = -1;
+        labelvals[i] = -1;
+    }
     for (i = 0; i < HEAP_MAX; i++)
+    {
         heap[i] = -1;
+    }
     
     // Read until end of file or an error occures, precompiling code
     while (1)
@@ -159,36 +164,7 @@ int main(int argc, char** argv)
                 break;
             }
             
-            // Attempt to create new label
-            // 1. Must be at least 1 open slot
-            // 2. Must not already exist
-            n = n % LABEL_MAX;
-            for (i = 0; i <= LABEL_MAX; i++)
-            {
-                // If we made full loop, no open spots
-                if (i == LABEL_MAX)
-                {
-                    // TODO throw error
-                    exit(1);
-                    break;
-                }
-                
-                // If we find duplicate, throw error
-                if (labels[(n + i) % LABEL_MAX] == n)
-                {
-                    // TODO throw error
-                    exit(1);
-                    break;
-                }
-                
-                // Check for clear spot. If found, take it!
-                if (labels[(n + i) % LABEL_MAX] == -1)
-                {
-                    labels[(n + i) % LABEL_MAX] = n;
-                    labelvals[(n + i) % LABEL_MAX] = cp;
-                    break;
-                }
-            }
+            cmd_flow_mark(n);
             break;
             
             
