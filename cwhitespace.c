@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 {
     FILE *in;                           // Pointer to input file
     char c;                             // Temporary variable for input
-    int treeptr = 0;                    // Current index into parse tree
+    int ptreeptr = 0;                    // Current index into parse tree
     
     // Print help if incorrect number of arguments were provided
     if (argc != 2)
@@ -109,7 +109,36 @@ int main(int argc, char** argv)
         // Check if error/end of file, break if so
         if (c == EOF) break;
         
+        // Offset tree pointer
+        switch (c)
+        {
+        case ' ':
+            ptreeptr = ptreeptr + SPACE;
+            break;
+            
+        case '\t':
+            ptreeptr = ptreeptr + TAB;
+            break;
+            
+        case '\n':
+            ptreeptr = ptreeptr + LINEFEED;
+            break;
+        }
         
+        // Determine action to take based on current position in parse tree
+        switch (ptree[ptreeptr])
+        {
+        case INCOMPLETE:
+            ptreeptr = (ptreeptr + 1) * 3;      // DEEPER INTO THE TREE WE GO
+            break;
+            
+            
+            
+        case INVALID:
+        default:
+            // TODO Display error
+            break;
+        }
         
     }
     
@@ -123,6 +152,81 @@ int main(int argc, char** argv)
     fclose(in);
     
     return 0;
+}
+
+
+// Parse a number in whitespace
+error_code ws_getnum(FILE* in, int& num)
+{
+    char c;                             // temporary variable for input
+    int neg = 0;                        // flag to make value negative
+    int bits = 0;                       // Count number of bits required to store number
+    int count = 0;                      // Bits read from file (to enforce minimum of 1 bit)
+    int n = 0;                          // Reset given number
+    
+    // Determine if number is positive/negative
+    c = ws_fgetc(in);
+    switch (c)
+    {
+    case ' ':                           // Space means positive
+        neg = 0;
+        break;
+        
+    case '\t':                          // Tab means negative
+        neg = 1;
+        break;
+        
+    case '\n':                          // Uh oh!
+        return ERROR_EXPECT_NUM;
+        
+    case EOF
+        return ERROR_UNEXPECT_EOF;
+    }
+    
+    // Start reading in number until newline is hit
+    do
+    {
+        c = ws_fgetc(in);
+        
+        switch(c)
+        {
+        case ' ':                       // Space means 0 bit
+            n = n << 1;
+            count = count + 1;
+            
+            // Increment bits if not only getting leading 0's
+            if (bits > 0)
+                bits = bits + 1;
+            break;
+            
+        case '\t':                      // Tab means 1 bit
+            n = n << 1;
+            n = n & 1;
+            count = count + 1;
+            bits = bits + 1
+            break;
+            
+        case EOF:                       // Uh oh!
+            return ERROR_UNEXPECT_EOF;
+        }
+        
+        // Make sure we aren't overflowing
+        if (bits >= (sizeof(n) * 8))
+            return ERROR_NUM_SIZE;
+    }
+    while (c != '\n');
+    
+    // Make sure at least 1 bit was read after the sign bit
+    if (count == 0)
+        return ERROR_NUM_FORMAT;
+    
+    // Negatize number if necessary
+    if (neg == 1) n = 0 - n;
+    
+    num = n;
+    
+    // Return success
+    return ERROR_NONE;
 }
 
 

@@ -54,3 +54,15 @@ typedef struct stmt {
     cmd_type cmd;
     num arg;
 } stmt;
+
+typedef enum {
+    ERROR_NONE = 0,
+    ERROR_NUM_FORMAT,
+    ERROR_NUM_SIZE,
+    ERROR_EXPECT_NUMBER,
+    ERROR_UNEXPECT_SPACE,
+    ERROR_UNEXPECT_TAB,
+    ERROR_UNEXPECT_LINEFEED,
+    ERROR_UNEXPECT_EOF,
+    ERROR_COMMAND_INVALID
+} error_code;
