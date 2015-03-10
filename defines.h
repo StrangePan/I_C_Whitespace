@@ -1,9 +1,10 @@
 // Global constants
-#define STACK_MAX       512
+#define STACK_MAX       1028
 #define PCSTACK_MAX     512
 #define LABEL_MAX       512
-#define HEAP_MAX        512
+#define HEAP_MAX        1024
 #define CACHE_MIN       512
+#define BUFFER_MAX      1028
 
 
 

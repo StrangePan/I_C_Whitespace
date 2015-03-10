@@ -36,10 +36,15 @@ num heap[HEAP_MAX];                     // Map for heap addresses
 num heapvals[HEAP_MAX];                  // Values in heap
 
 struct stmt* cache;                     // Dynamic array for cached values
-int cp = -1;                                 // Pointer into next open spot in cache
-int cache_size;
+int cp = -1;                            // Pointer into next open spot in cache
+int cache_size;                         // Current number of items in cache
 
-// Fancy parse lookup tree for fast parsing
+char buffer[BUFFER_MAX] = {0};          // Input buffer for efficiency
+int bufferptr = 0;                      // Current position in buffer
+
+
+
+// Fancy lookup tree for fast parsing
 cmd_type ptree[120] = {
     // space            // tab              // lf
     INCOMPLETE,         INCOMPLETE,         INCOMPLETE,     //
@@ -505,7 +510,20 @@ char ws_fgetc(FILE* in)
     // Loop forever
     do
     {
-        c = fgetc(in);
+        // Fill buffer if needed
+        if (buffer[bufferptr] == '\0')
+        {
+            // Read in checking for EOF
+            if (fgets(buffer, BUFFER_MAX, in) == NULL)
+            {
+                c = EOF;
+                break;
+            }
+            bufferptr = 0;
+        }
+        
+        c = buffer[bufferptr];
+        bufferptr = bufferptr + 1;
         
         switch(c)
         {
