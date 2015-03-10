@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "defines.h"
 
 int cmd_stack_push(num arg);
