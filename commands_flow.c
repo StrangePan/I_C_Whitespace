@@ -5,6 +5,8 @@ extern int pc;
 extern int errcode;
 extern num stack[STACK_MAX];
 extern int sp;
+extern int pcstack[PCSTACK_MAX];
+extern int pcsp;
 extern num labels[LABEL_MAX];
 extern int labelvals[LABEL_MAX];
 extern num heap[HEAP_MAX];
@@ -53,7 +55,20 @@ int cmd_flow_mark(num arg)
     return -1;
 }
 
-int cmd_flow_subroutine(num arg) { return 0; } // TODO
+int cmd_flow_subroutine(num arg)
+{
+    // Make sure we don't overflow our PC stack
+    if (pcsp >= PCSTACK_MAX)
+    {
+        // TODO STACK OVERFLOW!
+        return -1;
+    }
+    
+    // Push program counter onto pc stack and goto label
+    pcstack[pcsp] = pc;
+    pcsp = pcsp + 1;
+    return cmd_flow_goto(arg);
+}
 
 int cmd_flow_goto(num arg)
 {
@@ -114,4 +129,17 @@ int cmd_flow_goto_negative(num arg)
         return 0;
 }
 
-int cmd_flow_return() { return 0; } // TODO
+int cmd_flow_return()
+{
+    // Make sure we have something to pop from
+    if (pcsp < 1)
+    {
+        // TODO RETURNING FROM NOWHERE!
+        return -1;
+    }
+    
+    // Pop program counter off top of pc stack
+    pcsp = pcsp - 1;
+    pc = pcstack[pcsp];
+    return 0;
+}

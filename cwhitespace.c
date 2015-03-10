@@ -21,6 +21,9 @@ int errcode;
 num stack[STACK_MAX];                   // Stack array
 int sp = 0;                             // Index of next open spot in stack
 
+int pcstack[PCSTACK_MAX];               // A program counter stack (for subroutine calls only)
+int pcsp = 0;                           // Index of next open spot in pc stack
+
 num labels[LABEL_MAX];                  // Map of labels (index corresponds to index in labelptrs
 int labelvals[LABEL_MAX];               // Map of program counter points
 
